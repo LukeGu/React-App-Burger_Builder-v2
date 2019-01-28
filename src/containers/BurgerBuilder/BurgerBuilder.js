@@ -23,7 +23,7 @@ class BurgerBuilder extends Component {
     purchasable: false,
     purchasing: false,
     loading: false,
-    error:false
+    error: false
   };
 
   componentDidMount() {
@@ -32,11 +32,9 @@ class BurgerBuilder extends Component {
       .then(res => {
         this.setState({ ingredients: res.data });
       })
-      .catch(
-        error => {
-          this.setState({error:true});
-        }
-      );
+      .catch(error => {
+        this.setState({ error: true });
+      });
   }
 
   addIngredientHandler = type => {
@@ -91,29 +89,20 @@ class BurgerBuilder extends Component {
   };
 
   purchaseContinuewHandler = () => {
-    this.setState({ loading: true });
-    const order = {
-      ingredient: this.state.ingredients,
-      price: this.state.totalPrice,
-      customer: {
-        name: "Luke",
-        address: {
-          street: "1 test Rd",
-          suburb: "Test",
-          postcode: "1000"
-        },
-        email: "test@example.com",
-        deliverMethod: "fast"
-      }
-    };
-    axios
-      .post("/orders.json", order)
-      .then(response => {
-        this.setState({ loading: false, purchasing: false });
-      })
-      .catch(error => {
-        this.setState({ loading: false, purchasing: false });
-      });
+    const queryParams = [];
+    for (let i in this.state.ingredients) {
+      queryParams.push(
+        encodeURIComponent(i) +
+          "=" +
+          encodeURIComponent(this.state.ingredients[i])
+      );
+    }
+    queryParams.push("price=" + this.state.totalPrice);
+    const queryString = queryParams.join("&");
+    this.props.history.push({
+      pathname: "/checkout",
+      search: "?" + queryString
+    });
   };
 
   render() {
@@ -122,7 +111,11 @@ class BurgerBuilder extends Component {
       disabledInfo[key] = disabledInfo[key] <= 0;
     }
     let orderSummary = null;
-    let burger = this.state.error ? <h3 style={{textAlign:"center"}}>Ingredients can't be loaded!</h3> : <Spinner />;
+    let burger = this.state.error ? (
+      <h3 style={{ textAlign: "center" }}>Ingredients can't be loaded!</h3>
+    ) : (
+      <Spinner />
+    );
 
     if (this.state.ingredients) {
       burger = (
