@@ -1,13 +1,9 @@
-import * as actionType from "./action";
+import * as actionType from "../actions/actionTypes";
 
 const initialState = {
-  ingredients: {
-    salad: 0,
-    bacon: 0,
-    meat: 0,
-    cheese: 0
-  },
-  totalPrice: 4
+  ingredients: null,
+  totalPrice: 4,
+  error: false
 };
 
 const INGREDIENT_PRICES = {
@@ -36,6 +32,18 @@ const reducer = (state = initialState, action) => {
           [action.ingredientName]: state.ingredients[action.ingredientName] - 1
         },
         totalPrice: state.totalPrice - INGREDIENT_PRICES[action.ingredientName]
+      };
+    case actionType.SET_INGREDIENT:
+      return {
+        ...state,
+        ingredients: action.ingredients,
+        totalPrice: 4,
+        error: false
+      };
+    case actionType.FETCH_INGREDIENT_FAILED:
+      return {
+        ...state,
+        error: true
       };
     default:
       return state;
